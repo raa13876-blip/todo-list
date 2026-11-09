@@ -118,8 +118,22 @@
     $("#left-label").textContent = `${plural(active, ["задача", "задачи", "задач"])} ${plural(active, ["осталась", "осталось", "осталось"])}`;
     $("#clear-done").disabled = done === 0;
 
-    $("#progress-label").textContent = `${done} из ${inCategory.length} выполнено`;
-    $("#progress-fill").style.width = inCategory.length ? `${(done / inCategory.length) * 100}%` : "0";
+    // карточка прогресса: кольцо + счётчики
+    const pct = inCategory.length ? Math.round((done / inCategory.length) * 100) : 0;
+    const ring = $("#progress-ring");
+    $("#progress-value").style.strokeDashoffset = String(100 - pct);
+    $("#progress-percent").textContent = `${pct}%`;
+    ring.setAttribute("aria-valuenow", String(pct));
+    ring.classList.toggle("is-empty", pct === 0);
+    $("#stat-total").textContent = inCategory.length;
+    $("#stat-active").textContent = active;
+    $("#stat-done").textContent = done;
+
+    // счётчики активных задач у категорий в боковой панели
+    document.querySelectorAll("[data-cat-count]").forEach((el) => {
+      const cat = el.dataset.catCount;
+      el.textContent = state.tasks.filter((t) => !t.done && (cat === "all" || t.category === cat)).length;
+    });
 
     document.querySelectorAll(".filter").forEach((b) => {
       const on = b.dataset.filter === state.filter;

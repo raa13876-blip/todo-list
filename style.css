@@ -63,11 +63,11 @@ p, h1, ul { margin: 0; }
 
 /* ---------- Layout ---------- */
 .layout {
-  max-width: 1168px;
+  max-width: 1208px;
   margin: 0 auto;
   padding: 48px 0 24px;
   display: grid;
-  grid-template-columns: 220px minmax(0, 760px) 140px;
+  grid-template-columns: 220px minmax(0, 760px) 180px;
   gap: 24px;
   align-items: start;
 }
@@ -108,6 +108,9 @@ p, h1, ul { margin: 0; }
   color: var(--accent);
   font-weight: 600;
 }
+.category { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.category__count { font-size: 12px; font-weight: 500; color: var(--subtle); font-variant-numeric: tabular-nums; }
+.category.is-active .category__count { color: var(--accent); }
 
 /* ---------- Main ---------- */
 .main { display: flex; flex-direction: column; gap: 24px; }
@@ -399,31 +402,81 @@ p, h1, ul { margin: 0; }
 .hint { font-size: 12px; line-height: 1.5; color: var(--subtle); text-align: center; }
 
 /* ---------- Progress ---------- */
-.progress { display: flex; flex-direction: column; gap: 10px; }
-.progress__label { font-size: 12px; color: var(--muted); text-align: right; }
-.progress__bar { height: 4px; border-radius: 100px; background: var(--border); overflow: hidden; }
-.progress__fill { height: 100%; width: 0; border-radius: 100px; background: var(--accent); transition: width .3s; }
+.progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+.progress__title { align-self: stretch; font-size: 13px; font-weight: 600; color: var(--muted); }
+.progress__ring { position: relative; width: 112px; height: 112px; }
+.progress__ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.progress__track, .progress__value { fill: none; stroke-width: 10; }
+.progress__track { stroke: var(--border); }
+.progress__value {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset .5s ease, opacity .2s;
+}
+.progress__ring.is-empty .progress__value { opacity: 0; } /* без задач не рисуем точку от скруглённого края */
+.progress__percent {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  font-variant-numeric: tabular-nums;
+}
+.progress__stats {
+  align-self: stretch;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.progress__stats div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.progress__stats dt { color: var(--muted); }
+.progress__stats dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1220px) {
   .layout { grid-template-columns: 200px minmax(0, 1fr); padding: 40px 24px 24px; }
-  .progress { grid-column: 2; grid-row: 1; justify-self: end; width: 140px; }
-  .main { grid-column: 2; }
-  .sidebar { grid-row: 1 / span 2; }
+  /* прогресс переезжает в левую колонку, под категории */
+  .layout { grid-template-rows: auto 1fr; }
+  .sidebar { grid-column: 1; grid-row: 1; }
+  .progress { grid-column: 1; grid-row: 2; }
+  .main { grid-column: 2; grid-row: 1 / span 2; }
 }
 
 @media (max-width: 760px) {
   .layout { display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 24px 16px; }
   .layout > * { min-width: 0; }
   .add__input { width: 0; }
-  .progress { order: -1; width: 100%; }
-  .progress__label { text-align: left; }
+  /* на телефоне: логотип и категории сверху, под ними компактная карточка прогресса */
   .sidebar { order: 0; }
+  .progress { order: 1; flex-direction: row; gap: 18px; padding: 16px; }
+  .progress__title { display: none; }
+  .progress__ring { flex: none; width: 72px; height: 72px; }
+  .progress__percent { font-size: 17px; }
+  .progress__stats { flex: 1; flex-direction: row; justify-content: space-between; padding-top: 0; border-top: 0; }
+  .progress__stats div { flex-direction: column-reverse; gap: 2px; }
+  .progress__stats dd { font-size: 18px; }
   .sidebar__title { display: none; }
   .brand { margin-bottom: 4px; }
   .categories { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
   .category { flex: none; }
-  .main { order: 1; }
+  .main { order: 2; }
   .header__title { font-size: 32px; }
   .header__top { flex-wrap: wrap; }
   .header__controls { gap: 10px; }

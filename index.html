@@ -32,10 +32,10 @@
       </div>
       <p class="sidebar__title">Категории</p>
       <nav class="categories" id="categories">
-        <button class="category is-active" data-category="all">Все задачи</button>
-        <button class="category" data-category="today">Сегодня</button>
-        <button class="category" data-category="work">Работа</button>
-        <button class="category" data-category="personal">Личное</button>
+        <button class="category is-active" data-category="all">Все задачи <span class="category__count" data-cat-count="all">0</span></button>
+        <button class="category" data-category="today">Сегодня <span class="category__count" data-cat-count="today">0</span></button>
+        <button class="category" data-category="work">Работа <span class="category__count" data-cat-count="work">0</span></button>
+        <button class="category" data-category="personal">Личное <span class="category__count" data-cat-count="personal">0</span></button>
       </nav>
     </aside>
 
@@ -95,8 +95,19 @@
     </main>
 
     <aside class="progress" aria-label="Прогресс дня">
-      <p class="progress__label" id="progress-label">0 из 0 выполнено</p>
-      <div class="progress__bar"><div class="progress__fill" id="progress-fill"></div></div>
+      <p class="progress__title">Прогресс дня</p>
+      <div class="progress__ring" id="progress-ring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Выполнено задач">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="progress__track" cx="60" cy="60" r="52" />
+          <circle class="progress__value" id="progress-value" cx="60" cy="60" r="52" pathLength="100" />
+        </svg>
+        <span class="progress__percent" id="progress-percent">0%</span>
+      </div>
+      <dl class="progress__stats">
+        <div><dt>Всего</dt><dd id="stat-total">0</dd></div>
+        <div><dt>Активные</dt><dd id="stat-active">0</dd></div>
+        <div><dt>Выполнено</dt><dd id="stat-done">0</dd></div>
+      </dl>
     </aside>
   </div>
 
