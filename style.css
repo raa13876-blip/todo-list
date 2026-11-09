@@ -1,0 +1,438 @@
+:root {
+  --bg: #f7f8f6;
+  --surface: #ffffff;
+  --text: #252b28;
+  --muted: #727a75;
+  --subtle: #939a95;
+  --done: #959c97;
+  --border: #e6eae6;
+  --border-strong: #c9d1cb;
+  --accent: #456a58;
+  --accent-hover: #3a5a4a;
+  --accent-soft: #edf3ee;
+  --danger: #b4483c;
+  --danger-soft: #fbeeec;
+  --on-accent: #ffffff;
+  --radius: 8px;
+  --shadow: none;
+  --bg-glow: none;
+  color-scheme: light;
+}
+
+/* Тёмная тема: мягкий графит с лёгким холодным оттенком вместо чистого чёрного */
+:root[data-theme="dark"] {
+  --bg: #17181c;
+  --surface: #202227;
+  --text: #ececef;
+  --muted: #a4a7b0;
+  --subtle: #7d808a;
+  --done: #666973;
+  --border: #2d3037;
+  --border-strong: #3b3e47;
+  /* нейтральный акцент: без цветного оттенка */
+  --accent: #e8e9ed;
+  --accent-hover: #ffffff;
+  --accent-soft: #33363e;
+  --danger: #f08a7e;
+  --danger-soft: #3b2627;
+  --on-accent: #17181c;
+  --shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 8px 24px rgba(0, 0, 0, .28);
+  --bg-glow: radial-gradient(900px 520px at 50% -120px, #262932 0%, rgba(38, 41, 50, 0) 70%);
+  color-scheme: dark;
+}
+
+body { transition: background .2s, color .2s; }
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+html { min-height: 100%; }
+
+body {
+  background: var(--bg-glow) no-repeat, var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+p, h1, ul { margin: 0; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---------- Layout ---------- */
+.layout {
+  max-width: 1168px;
+  margin: 0 auto;
+  padding: 48px 0 24px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 760px) 140px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar { display: flex; flex-direction: column; gap: 12px; }
+
+/* Логотип */
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.brand__logo {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.brand__name { font-size: 17px; font-weight: 600; letter-spacing: -.3px; white-space: nowrap; }
+.sidebar__title { font-size: 13px; font-weight: 600; color: var(--muted); }
+.categories { display: flex; flex-direction: column; gap: 8px; }
+.category {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  transition: background .15s, border-color .15s;
+}
+.category:hover { border-color: var(--border-strong); }
+.category.is-active {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ---------- Main ---------- */
+.main { display: flex; flex-direction: column; gap: 24px; }
+
+.header { display: flex; flex-direction: column; gap: 12px; }
+.header__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.header__date { font-size: 13px; font-weight: 500; color: var(--muted); }
+.header__controls { display: flex; align-items: center; gap: 18px; flex: none; }
+.workspace { font-size: 15px; color: var(--muted); white-space: nowrap; }
+.avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--border-strong);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  user-select: none;
+}
+.theme-toggle {
+  flex: none;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: border-color .15s, background .15s;
+}
+.theme-toggle:hover { border-color: var(--subtle); }
+
+/* ---------- Звезда, бегущая по рамке кнопки темы ----------
+   Параметры как у StarBorder: 1 звезда, 4с, по часовой, шлейф 0.3, толщина 1px, свечение 0.6,
+   появляется при наведении, импульс при клике. */
+@property --star-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.theme-toggle {
+  position: relative;
+  --star: #111111;              /* в светлой теме — чёрная звезда, на белом её хорошо видно */
+  --star-duration: 4s;
+  --star-trail: 252deg;         /* 360° × (1 − 0.3): шлейф занимает 30% круга */
+  --star-glow: 60%;
+}
+:root[data-theme="dark"] .theme-toggle { --star: #ffffff; }
+
+.star-border {
+  position: absolute;
+  inset: -1px;                  /* поверх собственной рамки кнопки */
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--star) var(--star-glow), transparent));
+  transition: opacity .35s ease;
+}
+.star-border__line {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;                 /* толщина линии */
+  background: conic-gradient(from var(--star-angle), transparent 0 var(--star-trail), var(--star) 360deg);
+  /* оставляем видимой только рамку */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: star-orbit var(--star-duration) linear infinite paused;
+}
+.theme-toggle:hover .star-border,
+.theme-toggle:focus-visible .star-border { opacity: 1; }
+/* крутим звезду только пока её видно — в фоне анимация не тратит ресурсы */
+.theme-toggle:hover .star-border__line,
+.theme-toggle:focus-visible .star-border__line { animation-play-state: running; }
+
+@keyframes star-orbit { to { --star-angle: 360deg; } }
+
+/* Импульс при клике */
+.theme-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.theme-toggle.is-pulsing::after { animation: star-pulse .6s ease-out; }
+@keyframes star-pulse {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--star) 55%, transparent); }
+  to { box-shadow: 0 0 0 10px color-mix(in srgb, var(--star) 0%, transparent); }
+}
+
+/* На телефонах и планшетах (сенсорный экран или узкое окно) эффект отключён: там он подтормаживал */
+@media (prefers-reduced-motion: reduce), (hover: none), (max-width: 760px) {
+  .star-border { display: none; }
+  .theme-toggle.is-pulsing::after { animation: none; }
+}
+/* ширина подписи = ширине самой длинной из двух, чтобы соседи не сдвигались при переключении */
+.theme-toggle__label { display: inline-block; text-align: left; }
+.theme-toggle__label::before,
+.theme-toggle__label::after {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.theme-toggle__label::before { content: "Тёмная тема"; }
+.theme-toggle__label::after { content: "Светлая тема"; }
+.theme-toggle .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+:root[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+.header__date::first-letter { text-transform: uppercase; }
+.header__title { font-size: 40px; font-weight: 600; line-height: 1.2; letter-spacing: -1.5px; }
+.header__subtitle { font-size: 15px; line-height: 1.5; color: var(--muted); }
+
+/* ---------- Add form ---------- */
+.add { display: flex; gap: 12px; }
+.add__field {
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 0 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color .15s, box-shadow .15s;
+}
+.add__field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.add__icon { flex: none; color: var(--subtle); }
+.add__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+}
+.add__input::placeholder { color: var(--subtle); }
+.add__select {
+  flex: none;
+  border: 0;
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.add__field.is-error { border-color: var(--danger); animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.btn-primary {
+  height: 56px;
+  padding: 0 25px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 15px;
+  font-weight: 500;
+  transition: background .15s;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+/* ---------- Card ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.filters {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+}
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: background .15s;
+}
+.filter:hover { background: var(--bg); }
+.filter__count { font-size: 12px; color: var(--subtle); }
+.filter.is-active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.filter.is-active .filter__count { color: var(--accent); font-weight: 500; }
+
+/* ---------- Tasks ---------- */
+.tasks { list-style: none; padding: 0; }
+.task {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 28px;
+  border-bottom: 1px solid var(--border);
+  animation: appear .2s ease-out;
+}
+@keyframes appear { from { opacity: 0; transform: translateY(-4px); } }
+.task.is-removing { opacity: 0; transform: translateX(16px); transition: opacity .18s, transform .18s; }
+
+.check { position: relative; flex: none; width: 22px; height: 22px; cursor: pointer; }
+.check__input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.check__box {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1.3px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--on-accent);
+  transition: background .15s, border-color .15s;
+}
+.check__box svg { opacity: 0; transform: scale(.6); transition: opacity .15s, transform .15s; }
+.check:hover .check__box { border-color: var(--accent); }
+.check__input:checked + .check__box { background: var(--accent); border-color: var(--accent); }
+.check__input:checked + .check__box svg { opacity: 1; transform: none; }
+.check__input:focus-visible + .check__box { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.task__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.task.is-done .task__title { color: var(--done); text-decoration: line-through; }
+.task__tag { flex: none; font-size: 12px; color: var(--muted); }
+.task.is-done .task__tag { display: none; }
+
+.task__delete {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin-right: -6px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--subtle);
+  opacity: 0;
+  transition: opacity .15s, background .15s, color .15s;
+}
+.task:hover .task__delete, .task__delete:focus-visible { opacity: 1; }
+/* на сенсорных экранах наведения нет — крестик показываем всегда */
+@media (hover: none) { .task__delete { opacity: 1; } }
+.task__delete:hover { background: var(--danger-soft); color: var(--danger); }
+
+.empty { padding: 40px 28px; text-align: center; font-size: 14px; color: var(--subtle); border-bottom: 1px solid var(--border); }
+
+/* ---------- Summary ---------- */
+.summary {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.summary b { color: var(--accent); font-weight: 600; }
+.link-btn { font-size: 13px; color: var(--muted); }
+.link-btn:hover:not(:disabled) { color: var(--accent); }
+.link-btn:disabled { opacity: .45; cursor: default; }
+
+.hint { font-size: 12px; line-height: 1.5; color: var(--subtle); text-align: center; }
+
+/* ---------- Progress ---------- */
+.progress { display: flex; flex-direction: column; gap: 10px; }
+.progress__label { font-size: 12px; color: var(--muted); text-align: right; }
+.progress__bar { height: 4px; border-radius: 100px; background: var(--border); overflow: hidden; }
+.progress__fill { height: 100%; width: 0; border-radius: 100px; background: var(--accent); transition: width .3s; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1220px) {
+  .layout { grid-template-columns: 200px minmax(0, 1fr); padding: 40px 24px 24px; }
+  .progress { grid-column: 2; grid-row: 1; justify-self: end; width: 140px; }
+  .main { grid-column: 2; }
+  .sidebar { grid-row: 1 / span 2; }
+}
+
+@media (max-width: 760px) {
+  .layout { display: flex; flex-direction: column; align-items: stretch; gap: 20px; padding: 24px 16px; }
+  .layout > * { min-width: 0; }
+  .add__input { width: 0; }
+  .progress { order: -1; width: 100%; }
+  .progress__label { text-align: left; }
+  .sidebar { order: 0; }
+  .sidebar__title { display: none; }
+  .brand { margin-bottom: 4px; }
+  .categories { flex-direction: row; overflow-x: auto; scrollbar-width: none; }
+  .category { flex: none; }
+  .main { order: 1; }
+  .header__title { font-size: 32px; }
+  .header__top { flex-wrap: wrap; }
+  .header__controls { gap: 10px; }
+  .workspace { display: none; }
+  .add { flex-direction: column; }
+  .add__field { height: 52px; }
+  .btn-primary { height: 48px; }
+  .filters { overflow-x: auto; }
+  .filter { flex: none; }
+  .task, .summary { padding-left: 18px; padding-right: 18px; }
+  .task__delete { opacity: 1; }
+}
